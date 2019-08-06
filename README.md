@@ -53,7 +53,9 @@ Reapply /etc/exports by running
     sudo service nfs-kernel-server restart
 ```
 <br/>
+
 # Basic Setup on Slave cluster
+
 A shared directory must be configured on each slave cluster as well. Steps are as follows:
 ```
     sudo apt-get install nfs-common
