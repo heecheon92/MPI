@@ -25,21 +25,28 @@ In order for mpirun / mpiexec to execute a program in parallel smoothly, a passw
     ssh-copy-id client 		** ip-address may also be used.
     eval `ssh-agent`
     ssh-add ~/.ssh/id_rsa
-```
-If done correctly with all the steps above, the master should be able to ssh to the slave nodes without a password.
-If it is not working, rm ~/.ssh/id* and redo the steps above
-		step g might fix lots of potential problems.
+
 *  you might have to use -t dsa if your system is outdated. Like linux before 2000.
 ** client is defined in machine file or /etc/hosts
 	i.e. cat /etc/hosts
 	      192.168.x.x	client
 	      127.0.0.1		localhost
+```
+If done correctly with all the steps above, the master should be able to ssh to the slave nodes without a password.
+If it is not working, rm ~/.ssh/id* and redo the steps above <br />
+
+
 Once a passwordless ssh channel is created, a shared directory (nfs in this case), where a message can be interchanged, needs to be created. Passwordless ssh must be available to proceed to this step. Steps are as follows:
 ```    
     sudo apt-get install nfs-kernel-server
 ```
 create a folder name “cloud” under mpiuser’s home directory
 add an entry to /etc/exports with “home/mpiuser/cloud *(rw,sync,no_root_squash,no_subtree_check)”
+```
+    echo “home/mpiuser/cloud *(rw,sync,no_root_squash,no_subtree_check)” >> /etc/exports
+
+```
+
 Reapply /etc/exports by running 
 ```
     exportfs -a
@@ -53,8 +60,13 @@ create a folder name “cloud” under mpiuser’s home directory (slave node)
 ```
     sudo mount -t nfs master:/home/mpiuser/cloud ~/cloud
 ```
-Step c requires that slave cluster configure /etc/hosts with ip address and identity of the master cluster and itself.
-add the following entry to /etc/fstab so that the mounted shared folder does not get unmounted on reboot. “master:/home/mpiuser/cloud /home/mpiuser/cloud nfs”
+The step above requires that slave cluster configure /etc/hosts with ip address and identity of the master cluster and itself. <br/>
+
+Add the following entry to /etc/fstab so that the mounted shared folder does not get unmounted on reboot. “master:/home/mpiuser/cloud /home/mpiuser/cloud nfs”
+```
+    echo “master:/home/mpiuser/cloud /home/mpiuser/cloud nfs” >> /etc/fstab
+
+```
 
 Once the basic environments are setup, the mpi program can be executed. Methods are as follows:
 ```    
@@ -64,9 +76,11 @@ Once the basic environments are setup, the mpi program can be executed. Methods 
 ```
 
 Following is current /etc/hosts file on the master cluster:
+```
+    cat /etc/hosts
     127.0.0.1    localhost
-    \#127.0.1.1  master_identity
+    #127.0.1.1  master_identity
     192.168.0.31    master
     192.168.0.32    client
     192.168.0.33    client2
-
+```
