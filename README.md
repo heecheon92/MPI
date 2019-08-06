@@ -1,4 +1,4 @@
-##Basic Setup on Master cluster:
+# Basic Setup on Master cluster:
 
 Install mpich
 ```
@@ -52,6 +52,8 @@ Reapply /etc/exports by running
     exportfs -a
     sudo service nfs-kernel-server restart
 ```
+<br/>
+# Basic Setup on Slave cluster
 A shared directory must be configured on each slave cluster as well. Steps are as follows:
 ```
     sudo apt-get install nfs-common
@@ -68,7 +70,7 @@ Add the following entry to /etc/fstab so that the mounted shared folder does not
 
 ```
 
-Once the basic environments are setup, the mpi program can be executed. Methods are as follows:
+Once the basic environments are setup, the mpi program can be executed (From master cluster). Methods are as follows:
 ```    
     mpirun -np 1 (no. of cores) -hosts master,client (identities in /etc/hosts) ./mpi_executable
     mpirun -np 1 (no. of cores) ./mpi_executable # Running on the master cluster only.
