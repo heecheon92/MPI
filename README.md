@@ -33,7 +33,7 @@ In order for mpirun / mpiexec to execute a program in parallel smoothly, a passw
 	      127.0.0.1		localhost
 ```
 If done correctly with all the steps above, the master should be able to ssh to the slave nodes without a password.
-If it is not working, rm ~/.ssh/id* and redo the steps above <br />
+If it is not working, rm ~/.ssh/id* and redo the steps above. <br />
 
 
 Once a passwordless ssh channel is created, a shared directory (nfs in this case), where a message can be interchanged, needs to be created. Passwordless ssh must be available to proceed to this step. Steps are as follows:
@@ -41,6 +41,11 @@ Once a passwordless ssh channel is created, a shared directory (nfs in this case
     sudo apt-get install nfs-kernel-server
 ```
 create a folder name “cloud” under mpiuser’s home directory
+
+```
+    mkdir ~/cloud
+```
+
 add an entry to /etc/exports with “home/mpiuser/cloud *(rw,sync,no_root_squash,no_subtree_check)”
 ```
     echo “home/mpiuser/cloud *(rw,sync,no_root_squash,no_subtree_check)” >> /etc/exports
@@ -58,10 +63,12 @@ Reapply /etc/exports by running
 
 A shared directory must be configured on each slave cluster as well. Steps are as follows:
 ```
+    sudo apt-get update && sudo apt-get install mpich
     sudo apt-get install nfs-common
 ```
-create a folder name “cloud” under mpiuser’s home directory (slave node)
+Create a folder name “cloud” under mpiuser’s home directory (slave node) and mount to the shared directory (cloud) of the master cluster.
 ```
+    mkdir ~/cloud
     sudo mount -t nfs master:/home/mpiuser/cloud ~/cloud
 ```
 The step above requires that slave cluster configure /etc/hosts with ip address and identity of the master cluster and itself. <br/>
