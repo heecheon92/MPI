@@ -64,7 +64,7 @@ int main(){
         for (int i = 0; i < 1000; i++){
             //
             for (int j =0; j < 1000; j++){
-                inFile2 >> list_mat[i][j];
+                inFile2 >> list_mat2[i][j];
             }
         }
     }
@@ -91,7 +91,7 @@ void mat_mult(long long int **mat1, long long int **mat2, long long int **output
     int row = 1000;
     int col = 1000;
     
-    auto startTime = chrono::high_resolution_clock::now();
+    chrono::high_resolution_clock::time_point startTime = chrono::high_resolution_clock::now();
     
     for (int r = 0; r < row; r++){
         for (int c = 0; c < col; c++){
@@ -101,7 +101,7 @@ void mat_mult(long long int **mat1, long long int **mat2, long long int **output
         }
     }
     
-    auto endTime = chrono::high_resolution_clock::now();
+    chrono::high_resolution_clock::time_point endTime = chrono::high_resolution_clock::now();
     chrono::duration<double> timeElapsed = endTime - startTime;
     
     cout << "Matrix multiplication of two" << endl;
