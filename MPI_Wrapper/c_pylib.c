@@ -18,17 +18,31 @@ Build:
 
 #define MASTER 0
 
+void print_1d_mat(double* mat, int row, int col);
+//int MPI_Init( NULL, NULL );
+//int MPI_Finalize(void);
+//int MPI_Comm_rank( MPI_Comm comm, int *rank );
+//int MPI_Comm_size(MPI_Comm comm, int *size);
 
-int mpi_send(void* data, int count, int destination, int tag)
+MPI_Comm getCommunicator()
 {
-    MPI_Init(NULL,NULL);
-    return MPI_Send(&data, count, MPI_CHAR, destination, tag, MPI_COMM_WORLD);
+    return MPI_COMM_WORLD;
 }
 
-int mpi_recv(void* data, int count, int source, int tag)
+MPI_Status* getAnyStatus()
 {
-    MPI_Finalize();
-    return MPI_Recv(&data, count, MPI_CHAR, source, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    return MPI_STATUS_IGNORE;
+}
+
+void mpi_send(void* data, int count, int destination, int tag, MPI_Comm COMM)
+{
+    MPI_Send(data, count, MPI_DOUBLE, destination, tag, COMM);
+}
+
+
+void mpi_recv(void* data, int count, int source, int tag, MPI_Comm COMM)
+{
+    MPI_Recv(data, count, MPI_DOUBLE, source, tag, COMM, MPI_STATUS_IGNORE);
 }
 
 void matmul(double* matA, int rowA, int colA, 
@@ -65,7 +79,7 @@ void mpi_matmul(double* matA, int rowA, int colA,
     static double *local_mat2;
     static double *local_output_mat;
 
-    double gathered_output_mat[rowC * colC];
+    //double gathered_output_mat[rowC * colC];
 
     local_mat = (double*) malloc(sizeof(double) * chunkSize);
     local_mat2 = (double*) malloc(sizeof(double) * (rowB * colB));
@@ -103,6 +117,8 @@ void mpi_matmul(double* matA, int rowA, int colA,
         MPI_Send(local_output_mat, chunkSize, MPI_DOUBLE, MASTER, 3, MPI_COMM_WORLD);
         // Don't terminate the program until the subprocess's operation is completed.
         MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Finalize();
+        //MPI_Abort(MPI_COMM_WORLD, -1);
     }
 
     if (world_rank == MASTER)
@@ -114,7 +130,7 @@ void mpi_matmul(double* matA, int rowA, int colA,
         }
         printf("Collected all data at MASTER.\n");
         MPI_Barrier(MPI_COMM_WORLD);
-        //print_1d_mat(gathered_output_mat, 1000, 1000);
+        print_1d_mat(matC, 512, 512);
         fflush(stdout);
     }
 
@@ -148,19 +164,16 @@ int hello_mpi() {
     MPI_Finalize();
 }
 
+void print_1d_mat(double* mat, int row, int col)
+{
+    int i, k;
+    k = 0;
 
-//int MPI_Send(void* data,
-//             int count,
-//             MPI_Datatype datatype,
-//             int destination,
-//             int tag,
-//             MPI_Comm communicator)
-//
-//int MPI_Recv(void* data,
-//             int count,
-//             MPI_Datatype datatype,
-//             int source,
-//             int tag,
-//             MPI_Comm communicator,
-//             MPI_Status* status)
-
+    for ( i = 1; i <= row * col ; i++)
+    {
+        printf("%10.2lf ", mat[k]);
+        if ((i % col) == 0 || i == ( row * col)) printf("\n");
+        k++;
+    }
+    printf("Printing mat done....\n");
+}
